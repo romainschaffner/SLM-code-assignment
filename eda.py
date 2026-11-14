@@ -2,10 +2,11 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+from pathlib import Path
 
 # --- Data File Paths ---
 # NOTE: Update paths based on the local environment
-DATA_PATH_BASE = r'C:\Users\schaf\Documents\International Exchange ICAM 5\Cranfield courses\Applied-Artificial-Intelligence-2025-26--2025-Oct-13_08-31-41-327\Statistical Learning Methods\Assignment data and codes\data'
+DATA_DIR = Path(__file__).resolve().parent / "data"
 TRAIN_FILE = 'train_selected.csv'
 
 # --- Feature Selection ---
@@ -228,7 +229,7 @@ def plot_sensor_degradation_analysis(df):
                         mean_val - 2 * std_val, 
                         mean_val + 2 * std_val, 
                         color='black', alpha=0.15, 
-                        label='Spread (Mean ± 2$\sigma$)')
+                        label=r'Spread (Mean ± 2$\sigma$)')
         
         # 5. Threshold Line
         ax.axvline(x=FAILURE_THRESHOLD_CYCLE, color='red', linestyle='--', 
@@ -266,7 +267,8 @@ def plot_sensor_degradation_analysis(df):
 
 if __name__ == '__main__':
     # Construct full file path
-    full_train_filepath = f"{DATA_PATH_BASE}\\{TRAIN_FILE}"
+    full_train_filepath = DATA_DIR / TRAIN_FILE
+
     
     # 1. Load Data
     df_train_eda = load_and_prepare_data(full_train_filepath)
