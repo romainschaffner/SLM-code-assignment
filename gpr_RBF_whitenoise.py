@@ -200,13 +200,16 @@ if __name__ == '__main__':
     plt.errorbar(y_test_capped, y_pred, 
                  yerr=confidence, 
                  fmt='none', 
-                 ecolor='lightgray', 
-                 elinewidth=2, 
-                 capsize=0, 
-                 alpha=0.6, 
-                 label='95% Confidence Interval')
+                 ecolor='black',
+                 elinewidth=1.2,
+                 capsize=0,
+                 alpha=0.35,
+                 label='95% Confidence Interval',
+                 zorder=1)  # drawn behind the points
 
-    plt.scatter(y_test_capped, y_pred, alpha=0.8, c='blue', label='Prediction')
+    plt.scatter(y_test_capped, y_pred, alpha=0.8, c='blue',
+                edgecolors='white', linewidths=0.5,  # white outline separates points from the bars
+                label='Prediction', zorder=3)
 
     # Plot the ideal 45-degree line
     plt.plot([0, RUL_CAP], [0, RUL_CAP], 'r--', linewidth=2, label='Ideal Fit (y=x)')
