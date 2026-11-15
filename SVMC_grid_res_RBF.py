@@ -21,6 +21,8 @@ RUL_CAP = 125
 
 # Update this path if necessary
 DATA_DIR = Path(__file__).resolve().parent / "data"
+FIGURES_DIR = Path(__file__).resolve().parent / "figures"
+FIGURES_DIR.mkdir(exist_ok=True)
 TRAIN_FILE = 'train_selected.csv'
 TEST_FILE = 'test_selected.csv'
 TRUTH_FILE = 'PM_truth.txt'
@@ -111,6 +113,7 @@ def train_and_evaluate_classifier(model, model_name, X_train_scaled, y_train, X_
     fig, ax = plt.subplots(figsize=(8, 6))
     disp.plot(ax=ax, cmap='Blues', values_format='d')
     ax.set_title(f'Confusion Matrix - {model_name}')
+    plt.savefig(FIGURES_DIR / "confusion_matrix.png", dpi=300, bbox_inches="tight")
     plt.show()
 
 # --- MAIN EXECUTION SCRIPT ---

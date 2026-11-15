@@ -8,6 +8,9 @@ from pathlib import Path
 # NOTE: Update paths based on the local environment
 DATA_DIR = Path(__file__).resolve().parent / "data"
 TRAIN_FILE = 'train_selected.csv'
+FIGURES_DIR = Path(__file__).resolve().parent / "figures"
+FIGURES_DIR.mkdir(exist_ok=True)
+
 
 # --- Feature Selection ---
 SENSOR_COLS = ['s1', 's2', 's3', 's4']
@@ -257,7 +260,7 @@ def plot_sensor_degradation_analysis(df):
     axes[-1].set_xticks(np.arange(0, max_cycle + 25, 25))
     axes[-1].set_xlim(0, max_cycle + 5)
     axes[-1].set_xlabel('Time in Engine Cycles')
-    
+    plt.savefig(FIGURES_DIR / "sensor_degradation.png", dpi=300, bbox_inches="tight")
     plt.tight_layout()
     plt.subplots_adjust(hspace=0.4)
     plt.show()

@@ -26,6 +26,9 @@ DATA_DIR = Path(__file__).resolve().parent / "data"
 TRAIN_FILE = 'train_selected.csv'
 TEST_FILE = 'test_selected.csv'
 TRUTH_FILE = 'PM_truth.txt'
+FIGURES_DIR = Path(__file__).resolve().parent / "figures"
+FIGURES_DIR.mkdir(exist_ok=True)
+
 
 # --- 2. DATA LOADING AND RUL CALCULATION ---
 
@@ -215,6 +218,8 @@ if __name__ == '__main__':
     plt.grid(True, linestyle='--', alpha=0.6)
     plt.xlim(0, RUL_CAP + 5)
     plt.ylim(0, RUL_CAP + 20) # Give space for error bars
+    plt.savefig(FIGURES_DIR / "gpr_actual_vs_predicted.png with 95% Confidence.png", dpi=300, bbox_inches="tight")
+
     
     # --- 8. Visualization 2: Model Fit vs. Key Features (All 5 Features) ---
     print("Generating Visualization 2: Model Fit vs. All Sensor Features (Separate Plots)...")
