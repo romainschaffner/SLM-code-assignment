@@ -108,11 +108,11 @@ def train_and_evaluate_classifier(model, model_name, X_train_scaled, y_train, X_
     # --- Confusion Matrix Display ---
     print(f"Generating Confusion Matrix for {model_name}...")
     cm = confusion_matrix(y_test, y_pred)
-    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=['0', '1'])
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=['Healthy', 'Failing (RUL ≤ 30)'])
     
     fig, ax = plt.subplots(figsize=(8, 6))
-    disp.plot(ax=ax, cmap='Blues', values_format='d')
-    ax.set_title(f'Confusion Matrix - {model_name}')
+    disp.plot(ax=ax, cmap='Blues', values_format='d', colorbar=False)
+    ax.set_title("SVM (RBF) on 100 test engines")
     plt.savefig(FIGURES_DIR / "confusion_matrix.png", dpi=300, bbox_inches="tight")
     plt.show()
 

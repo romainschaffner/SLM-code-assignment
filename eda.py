@@ -14,6 +14,7 @@ FIGURES_DIR.mkdir(exist_ok=True)
 
 # --- Feature Selection ---
 SENSOR_COLS = ['s1', 's2', 's3', 's4']
+PLOT_SENSORS = ['s3', 's4']
 
 # Capping RUL prevents the model from learning from "infinite" health states
 RUL_CAP = 125 
@@ -198,16 +199,16 @@ def plot_sensor_degradation_analysis(df):
     - Variance Cone (Mean +/- 2 Std Dev) to show increasing noise (heteroscedasticity).
     - Threshold vertical line.
     """
-    mean_trend = df.groupby('cycle')[SENSOR_COLS].mean()
-    std_trend = df.groupby('cycle')[SENSOR_COLS].std()
+    mean_trend = df.groupby('cycle')[PLOT_SENSORS].mean()
+    std_trend = df.groupby('cycle')[PLOT_SENSORS].std()
     
-    fig, axes = plt.subplots(nrows=len(SENSOR_COLS), ncols=1, figsize=(14, 18), sharex=True)
+    fig, axes = plt.subplots(nrows=len(PLOT_SENSORS), ncols=1, figsize=(14, 9), sharex=True)
     
     # Split data based on hypothesis
     early_life = df[df['cycle'] < FAILURE_THRESHOLD_CYCLE]
     late_life = df[df['cycle'] >= FAILURE_THRESHOLD_CYCLE]
     
-    for i, sensor in enumerate(SENSOR_COLS):
+    for i, sensor in enumerate(PLOT_SENSORS):
         ax = axes[i]
         
         # 1. Plot Healthy Phase
@@ -246,7 +247,7 @@ def plot_sensor_degradation_analysis(df):
         # Legend handling
         handles, labels = ax.get_legend_handles_labels()
         unique_labels = {l: h for h, l in zip(handles, labels)}
-        ax.legend(unique_labels.values(), unique_labels.keys(), loc='upper left', fontsize=10)
+        # ax.legend(unique_labels.values(), unique_labels.keys(), loc='upper left', fontsize=10)
         
         # Axis Scaling (Same logic as raw plot)
         q01 = df[sensor].quantile(0.01)
@@ -254,15 +255,21 @@ def plot_sensor_degradation_analysis(df):
         padding = (q99 - q01) * 0.1 
         if pd.notna(q01) and pd.notna(q99):
             ax.set_ylim(q01 - padding, q99 + padding)
-            
+
+    leg = fig.legend(handles, labels, loc="upper center", ncol=5)
+    for h in leg.legend_handles:
+        h.set_alpha(1)
+
+    
     # Set X-axis ticks
-    max_cycle = int(df['cycle'].max())
+    max_cycle = 300
     axes[-1].set_xticks(np.arange(0, max_cycle + 25, 25))
     axes[-1].set_xlim(0, max_cycle + 5)
     axes[-1].set_xlabel('Time in Engine Cycles')
-    plt.savefig(FIGURES_DIR / "sensor_degradation.png", dpi=300, bbox_inches="tight")
-    plt.tight_layout()
+    # rect leaves the top 8% of the figure free for the legend
+    plt.tight_layout(rect=[0, 0, 1, 0.92])
     plt.subplots_adjust(hspace=0.4)
+    plt.savefig(FIGURES_DIR / "sensor_degradation.png", dpi=100, bbox_inches="tight")
     plt.show()
 
 

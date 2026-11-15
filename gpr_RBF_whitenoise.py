@@ -199,7 +199,7 @@ if __name__ == '__main__':
 
     plt.errorbar(y_test_capped, y_pred, 
                  yerr=confidence, 
-                 fmt='o', 
+                 fmt='none', 
                  ecolor='lightgray', 
                  elinewidth=2, 
                  capsize=0, 
@@ -217,8 +217,8 @@ if __name__ == '__main__':
     plt.legend()
     plt.grid(True, linestyle='--', alpha=0.6)
     plt.xlim(0, RUL_CAP + 5)
-    plt.ylim(0, RUL_CAP + 20) # Give space for error bars
-    plt.savefig(FIGURES_DIR / "gpr_actual_vs_predicted.png with 95% Confidence.png", dpi=300, bbox_inches="tight")
+    # plt.ylim(0, RUL_CAP + 60) # Give space for error bars
+    plt.savefig(FIGURES_DIR / "gpr_actual_vs_predicted.png", dpi=300, bbox_inches="tight")
 
     
     # --- 8. Visualization 2: Model Fit vs. Key Features (All 5 Features) ---
