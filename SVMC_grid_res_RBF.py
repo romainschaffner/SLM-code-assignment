@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 import time
+from pathlib import Path
 
 # Scikit-learn imports
 from sklearn.preprocessing import StandardScaler
@@ -19,7 +20,7 @@ FEATURES = ['cycle', 's1', 's2', 's3', 's4']
 RUL_CAP = 125 
 
 # Update this path if necessary
-DATA_PATH_BASE = r'C:\Users\schaf\Documents\International Exchange ICAM 5\Cranfield courses\Applied-Artificial-Intelligence-2025-26--2025-Oct-13_08-31-41-327\Statistical Learning Methods\Assignment data and codes\data'
+DATA_DIR = Path(__file__).resolve().parent / "data"
 TRAIN_FILE = 'train_selected.csv'
 TEST_FILE = 'test_selected.csv'
 TRUTH_FILE = 'PM_truth.txt'
@@ -117,7 +118,7 @@ if __name__ == '__main__':
     
     # --- 1. Load and Prepare TRAINING Data ---
     print("Loading training data (train_selected.csv)...")
-    full_train_filepath = f"{DATA_PATH_BASE}\\{TRAIN_FILE}"
+    full_train_filepath = DATA_DIR / TRAIN_FILE
     df_train = load_data(full_train_filepath)
 
     X_train = df_train[FEATURES]
@@ -129,12 +130,12 @@ if __name__ == '__main__':
 
     # --- 2. Load and Prepare TEST Data ---
     print("\nLoading test data (test_selected.csv)...")
-    full_test_filepath = f"{DATA_PATH_BASE}\\{TEST_FILE}"
+    full_test_filepath = DATA_DIR / TEST_FILE
     df_test = load_data(full_test_filepath)
     X_test = df_test[FEATURES]
 
     print("\nLoading ground truth (PM_truth.txt)...")
-    full_truth_filepath = f"{DATA_PATH_BASE}\\{TRUTH_FILE}"
+    full_truth_filepath = DATA_DIR / TRUTH_FILE
     df_truth = pd.read_csv(full_truth_filepath, header=None, names=['RUL_true'])
     
     # Create test labels: 1 if RUL <= 30 (imminent failure), else 0

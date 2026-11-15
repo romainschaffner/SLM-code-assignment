@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 import time
+from pathlib import Path
 
 # Scikit-learn imports
 from sklearn.preprocessing import StandardScaler
@@ -21,7 +22,7 @@ SENSOR_COLS = ['s1', 's2', 's3', 's4']
 # --- NEW: Define the full feature set including 'cycle' ---
 FEATURE_COLS = ['cycle'] + SENSOR_COLS 
 RUL_CAP = 125 
-DATA_PATH_BASE = r'C:\Users\schaf\Documents\International Exchange ICAM 5\Cranfield courses\Applied-Artificial-Intelligence-2025-26--2025-Oct-13_08-31-41-327\Statistical Learning Methods\Assignment data and codes\data'
+DATA_DIR = Path(__file__).resolve().parent / "data"
 TRAIN_FILE = 'train_selected.csv'
 TEST_FILE = 'test_selected.csv'
 TRUTH_FILE = 'PM_truth.txt'
@@ -83,7 +84,7 @@ if __name__ == '__main__':
     # --- 3. Feature, Target, and Test Set Preparation ---
     print("Loading and preparing data...")
     # 1. Load Training Data
-    full_train_filepath = f"{DATA_PATH_BASE}\\{TRAIN_FILE}"
+    full_train_filepath = DATA_DIR / TRAIN_FILE
     df_train = load_and_prepare_data(full_train_filepath)
 
     # 2. Define X and y
@@ -106,7 +107,7 @@ if __name__ == '__main__':
     X_train_scaled = scaler.fit_transform(X_train_subset)
 
     # 5. Load and Prepare Test Data
-    full_test_filepath = f"{DATA_PATH_BASE}\\{TEST_FILE}"
+    full_test_filepath = DATA_DIR/TEST_FILE
     df_test = pd.read_csv(full_test_filepath, sep=';', decimal=',', header=0)
     # Ensure correct column names even if test file has 'id'
     df_test.rename(columns={'id': 'engine_id'}, inplace=True)
@@ -114,7 +115,7 @@ if __name__ == '__main__':
     X_test = df_test[FEATURE_COLS]
 
     # Load ground truth RUL values
-    full_truth_filepath = f"{DATA_PATH_BASE}\\{TRUTH_FILE}"
+    full_truth_filepath = DATA_DIR/TRUTH_FILE
     y_truth_df = pd.read_csv(full_truth_filepath, header=None, names=['RUL_True'])
     y_test = y_truth_df['RUL_True']
 
