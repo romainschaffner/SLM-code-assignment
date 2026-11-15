@@ -257,7 +257,9 @@ def plot_sensor_degradation_analysis(df):
             ax.set_ylim(q01 - padding, q99 + padding)
 
     leg = fig.legend(handles, labels, loc="upper center", ncol=5)
-    for h in leg.legend_handles:
+    # Only the two scatter entries (Healthy, Degrading) are made opaque;
+    # the Spread band must keep its transparency
+    for h in leg.legend_handles[:2]:
         h.set_alpha(1)
 
     
