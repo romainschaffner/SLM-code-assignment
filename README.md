@@ -1,5 +1,7 @@
 # Predictive maintenance of turbofan engines with statistical learning
 
+*Cranfield MSc Applied AI coursework (Dec 2025), revisited in Nov 2026.*
+
 The objective of this project is to predict how many cycles an engine has left before failure (**remaining useful life, RUL**) and flag the engines that need maintenance within the next 30 cycles.
 
 **Key results (100 test engines)**
@@ -9,13 +11,18 @@ The objective of this project is to predict how many cycles an engine has left b
 
 ## Problem and data
 
-The project uses three files, all in `data/`. Train and test are CSV files.
+Each row is one cycle of one engine: its age in cycles and four sensor measurements (s1 to s4).
+The models learn from 100 engines followed until failure, then predict the RUL of 100 other engines observed once, before failure.
+The true RUL of these test engines is used only to score the predictions.
 
-| File | Content | Size |
+| File (in `data/`) | Content | Size |
 |---|---|---|
 | `train_selected.csv` | Full run-to-failure history of 100 engines, with the corresponding RUL | 20,631 rows (one per engine and cycle) |
 | `test_selected.csv` | One snapshot per engine of 100 other engines, **without** the RUL | 100 rows (one per engine) |
 | `PM_truth.txt` | True RUL of each test engine, one value per line, in the order of `id` in the test file | 100 values |
+
+<details>
+<summary>Data dictionary</summary>
 
 **Columns of `test_selected.csv`** (also present in the train file):
 
@@ -32,12 +39,14 @@ The project uses three files, all in `data/`. Train and test are CSV files.
 | `ttf` | Time to failure: the number of cycles left before the engine fails at that row. It is the RUL. It counts down to 0 at the last row of each engine (e.g. engine 1: `ttf` = 191 at cycle 1, 190 at cycle 2, ..., 0 at its last cycle). |
 | `label_bnc` | Binary label for the classification task: `1` if `ttf` ≤ 30 (the engine fails within 30 cycles), `0` otherwise |
 
-In `eda.py` and `gpr_RBF_whitenoise.py`, `ttf` is renamed `RUL` and a capped version `RUL_Capped` (max 125) is added. The notebook caps `ttf` directly.
+In `eda.py` and `gpr_regression.py`, `ttf` is renamed `RUL` and a capped version `RUL_Capped` (max 125) is added. The notebook caps `ttf` directly.
 
 **How the files are used**
 - **Train**: each engine is followed from cycle 1 until it fails, so every row has its RUL. The models learn from these rows.
 - **Test**: each engine appears only once, at the last cycle observed before failure. The models predict its RUL and its `label_bnc` from `cycle` and the sensors (see Models for which ones).
 - **Truth**: `PM_truth.txt` gives the real RUL of each test engine. It is used only to score the predictions. The real label of the test engines is derived from it (RUL ≤ 30 means failing, which gives the 25 failing / 75 healthy split).
+
+</details>
 
 Source: anonymised extract of simulated run-to-failure engine data (Microsoft predictive maintenance template).
 
@@ -47,10 +56,10 @@ Source: anonymised extract of simulated run-to-failure engine data (Microsoft pr
 
 | What the data shows | Decision |
 |---|---|
-| Sensors stay flat for about 100 cycles, then drift faster and faster (figure above). With the Ridge, a straight line (degree 1) reaches R² 0.66 on the test set, against 0.73 for degree 4: the relation to RUL is not linear. | Non-linear models: polynomial features for Ridge, RBF kernel for GPR and SVM. |
+| Sensors stay flat for about 100 cycles, then drift faster and faster (figure above). In cross-validation on the training set, a straight line (Ridge, degree 1) reaches R² 0.72 and MAE 17.8 cycles, against 0.79 and 13.6 for degree 4: the relation to RUL is not linear. | Non-linear models: polynomial features for Ridge, RBF kernel for GPR and SVM. |
 | Sensors remain stable as long as the engines are healthy, so sensor values look the same whether the RUL is 300 or 150 cycles. | RUL capped at 125 cycles for both regression models. The correlation of s3 with the RUL rises from -0.70 to -0.78 ([correlation matrix](figures/correlation_matrix.png)). |
 | The four sensors carry almost the same information: similar correlation with the RUL (\|r\| = 0.66 to 0.70) and strongly correlated with each other (\|r\| = 0.79 to 0.85). | Ridge uses two of them (s3, s4) instead of all four. |
-| Only 15 % of training rows are "failing within 30 cycles" (printed by `SVMC_grid_res_RBF.py`). | `class_weight="balanced"` for the SVM. Evaluation with recall and F1, not accuracy. |
+| Only 15 % of training rows are "failing within 30 cycles" (printed by `svm_classifier.py`). | `class_weight="balanced"` for the SVM. Evaluation with recall and F1, not accuracy. |
 | The spread between engines peaks around cycle 150, when healthy and near-failure engines run side by side; only 17 of 100 engines reach cycle 250. | GPR, which gives a confidence interval that widens where data is scarce. |
 
 ## Models
@@ -98,9 +107,9 @@ The column of points at RUL = 125 are healthy engines, where the capped target g
 | File | Role |
 |---|---|
 | `eda.py` | Data cleaning, RUL capping, sensor degradation plots, correlation matrix |
-| `poly2multi_ridge.ipynb` | Polynomial Ridge regression of the RUL, degree chosen by cross-validation |
-| `gpr_RBF_whitenoise.py` | Gaussian Process regression with 95 % intervals |
-| `SVMC_grid_res_RBF.py` | SVM classifier (failing within 30 cycles) |
+| `ridge_regression.ipynb` | Polynomial Ridge regression of the RUL, degree chosen by cross-validation |
+| `gpr_regression.py` | Gaussian Process regression with uncertainty intervals |
+| `svm_classifier.py` | SVM classifier (failing within 30 cycles) |
 | `data/` | Train, test and true RUL files |
 | `figures/` | All saved plots (shown or linked above) |
 
@@ -109,8 +118,8 @@ The column of points at RUL = 125 are healthy engines, where the capped target g
 ```bash
 pip install -r requirements.txt
 python eda.py
-python SVMC_grid_res_RBF.py
-python gpr_RBF_whitenoise.py   # slower: Gaussian Process on 2,500 points
+python svm_classifier.py
+python gpr_regression.py   # slower: Gaussian Process on 2,500 points
 ```
 
-The Ridge regression is in `poly2multi_ridge.ipynb`: open it in Jupyter or VS Code and run all cells.
+The Ridge regression is in `ridge_regression.ipynb`: open it in Jupyter or VS Code and run all cells.
