@@ -102,6 +102,7 @@ def plot_correlation_matrix(df):
         linecolor='black'
     )
     plt.tight_layout()
+    plt.savefig(FIGURES_DIR / "correlation_matrix.png", dpi=100, bbox_inches="tight")
     plt.show()
 
 
